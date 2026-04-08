@@ -9,3 +9,4 @@ exportToHTML/
 *.bin
 *.zip
 *.pyc
+datasets/Pre_cleaned_dataset.csv
