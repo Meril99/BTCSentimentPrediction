@@ -43,6 +43,14 @@ With proper chronological validation (train on 2021–2022, test on 2023), all m
 - More flexible models exploit data leakage more aggressively (AdaBoost +24% vs RF +6%)
 - Institutional actors (governments, exchanges) dominate price action over retail Twitter sentiment
 
+## Why It Fails — and What Might Not
+
+The naive approach of averaging daily tweet sentiment into a single score and predicting next-day direction doesn't work. But the EDA reveals *why*, which points to what a better approach would look like:
+
+- **Daily aggregation is too coarse** — a viral tweet from a major figure moves BTC within minutes. By the next day, the market has already priced it in. Intraday granularity could capture signal that daily averages destroy.
+- **Not all tweets are equal** — the May 2021 crash analysis shows institutional announcements (US government selling 41,500 BTC, Binance regulatory pressure) moved the market despite overwhelmingly positive retail sentiment. Monitoring *specific high-impact actors* rather than averaging all tweets could work.
+- **Polarity is too crude** — Word2Vec embeddings (semantic content) added more signal than VADER's positive/negative scores. "Government sells 41,500 BTC" and "Bitcoin is the future" both matter, but for completely different reasons that a polarity score can't distinguish.
+
 ## Tech Stack
 
 Python 3.11 | pandas | scikit-learn | XGBoost | VADER | Word2Vec | statsmodels | matplotlib | seaborn
