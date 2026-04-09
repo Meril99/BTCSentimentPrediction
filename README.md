@@ -18,21 +18,30 @@ Raw tweets (7.4M) + BTC OHLCV ──► Preprocessing ──► Feature Engineer
 | `general_ExplanatoryDataAnalysis.ipynb` | Initial EDA — distributions, correlations, word clouds, crash/surge analysis |
 | `advanced_eda.ipynb` | Stationarity tests (ADF), lag correlation analysis, Granger causality, market regime detection |
 | `randomForestModel.ipynb` | Random Forest with multiple feature subsets (baseline, +Word2Vec, market-only, tweet-only) |
-| `XGBOOST_ADABOOST.ipynb` | XGBoost and AdaBoost — significant accuracy improvement over RF |
+| `XGBOOST_ADABOOST.ipynb` | XGBoost and AdaBoost — apparent accuracy improvement over RF (random split) |
 | `robust_evaluation.ipynb` | Time-based validation, lag features, walk-forward CV, bootstrap CIs, McNemar's test |
 
 ## Results
 
-Standard tree-based models (Random Forest) plateau around 50–56% accuracy — barely above the majority-class baseline. **XGBoost and AdaBoost break through** to 67–73% by better handling feature interactions and weak signals.
+With random train/test splits, AdaBoost reaches 73% and XGBoost 67%. However, **random splits on time-series data cause data leakage** — the model trains on future data and "predicts" the past.
 
-The `robust_evaluation` notebook addresses data leakage concerns (random vs time-based splits), engineers lag features to prevent look-ahead bias, and reports bootstrap confidence intervals for all metrics.
+With proper chronological validation (train on 2021–2022, test on 2023), all models collapse to baseline (~50–53%). Bootstrap confidence intervals confirm none are statistically significant.
+
+| Model | Random Split | Time-Based Split | Inflation |
+|-------|-------------|-----------------|-----------|
+| AdaBoost | 73.37% | 49.40% | +23.97% |
+| XGBoost | 67.46% | 52.98% | +14.48% |
+| Random Forest | 56.80% | 51.19% | +5.61% |
+| Baseline (majority) | — | 51.43% | — |
 
 ## Key Findings
 
-- Market features alone (Open, Volume, Volatility) outperform tweet-only features with Random Forest
-- Combining sentiment + market data with boosted models yields the best results
-- AdaBoost with shallow decision trees achieves the highest test accuracy
-- Lag analysis reveals whether sentiment leads or follows price movements
+- Tweet sentiment does not predict BTC daily price direction under proper temporal validation
+- Granger causality and lag correlation tests confirm no causal relationship in either direction
+- The sentiment-price correlation reverses across bull/bear regimes, cancelling out in aggregate
+- Market features (Open, Volume, Volatility) outperform sentiment features with Random Forest
+- More flexible models exploit data leakage more aggressively (AdaBoost +24% vs RF +6%)
+- Institutional actors (governments, exchanges) dominate price action over retail Twitter sentiment
 
 ## Tech Stack
 
